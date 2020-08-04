@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
-
+#include "format.h"
 #include "linux_parser.h"
 
 using std::stof;
@@ -197,5 +197,7 @@ long LinuxParser::UpTime(int pid)
  */
   start = std::stol(aux[21])/sysconf(_SC_CLK_TCK);
   up_time =  LinuxParser::UpTime() - start;
+  string up_time_format = Format::ElapsedTime(up_time);
+  std::cout << "up time " << up_time_format<< std::endl;
   return up_time;
 }
