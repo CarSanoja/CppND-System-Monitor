@@ -245,8 +245,10 @@ long LinuxParser::UpTime(int pid)
  of the specified base, which is returned as a value of type long int. 
  */
   start = std::stol(aux[21])/sysconf(_SC_CLK_TCK);
+  std::cout << "usage " << start << std::endl;
   up_time =  LinuxParser::UpTime() - start;
+  std::cout << "usage " << up_time << std::endl;
   string up_time_format = Format::ElapsedTime(up_time);
-  std::cout << "up time " << up_time_format<< std::endl;
+  //std::cout << "up time " << up_time_format<< std::endl;
   return up_time;
 }
