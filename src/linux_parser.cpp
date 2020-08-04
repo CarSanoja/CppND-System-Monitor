@@ -10,6 +10,18 @@ using std::string;
 using std::to_string;
 using std::vector;
 
+/*
+
+Linux stores data about individual processes in files within subdirectories 
+of the /proc directory. Each subdirectory is named for that particular 
+process's identifier number. The data that this project requires exists in 
+those files.
+
+This library helps to obtain every information saved in those directories
+
+*/
+
+
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
   string line;
@@ -67,6 +79,13 @@ vector<int> LinuxParser::Pids() {
 }
 
 // TODO: Read and return the system memory utilization
+/*
+htop author here. These are the calculations I make to get the numbers for the green, blue and yellow bars in the memory meter:
+
+    Total used memory = MemTotal - MemFree
+
+    Dividing for the entiry memory we obtain thepercentage of usage
+*/
 float LinuxParser::MemoryUtilization()
 {
   float total_memory;
@@ -112,11 +131,27 @@ long LinuxParser::UpTime()
   return _uptime;
 }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
-
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
+
+/*
+
+  To calculate CPU usage for a specific process you'll need the following:
+
+    /proc/uptime
+        #1 uptime of the system (seconds)
+    /proc/[PID]/stat
+        #14 utime - CPU time spent in user code, measured in clock ticks
+        #15 stime - CPU time spent in kernel code, measured in clock ticks
+        #16 cutime - Waited-for children's CPU time spent in user code (in clock ticks)
+        #17 cstime - Waited-for children's CPU time spent in kernel code (in clock ticks)
+        #22 starttime - Time when the process started, measured in clock ticks
+    Hertz (number of clock ticks per second) of your system.
+        In most cases, getconf CLK_TCK can be used to return the number of clock ticks.
+        The sysconf(_SC_CLK_TCK) C function call may also be used to return the hertz value.
+
+
+*/
 long LinuxParser::ActiveJiffies(int pid) 
 {
   string value;
@@ -139,13 +174,9 @@ long LinuxParser::ActiveJiffies(int pid)
   return t_clk;
 }
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
-
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
 
 // TODO: Read and return CPU utilization
+
 vector<string> LinuxParser::CpuUtilization()
 {
   string value;
@@ -263,6 +294,21 @@ string LinuxParser::Ram(int pid)
 
 // TODO: Read and return the user ID associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
+
+/*
+
+Each process has an associated user identifier (UID), corresponding to the 
+process owner. This means that determining the process owner requires two 
+steps:
+
+    Find the UID associated with the process
+    Find the user corresponding to that UID
+
+The UID for a process is stored in /proc/[PID]/status.
+
+For the purposes of this project, simply need to capture the first integer on the "Uid:" line.
+
+*/
 string LinuxParser::Uid(int pid) 
 {
   string key;

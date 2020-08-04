@@ -29,8 +29,10 @@ float Process::CpuUtilization()
 {
     long int Hz = sysconf(_SC_CLK_TCK);
     double seconds;
+    // seconds = uptime - (starttime / Hertz)
     seconds = LinuxParser::UpTime() - ((float)_cpu / Hz);
-    return ((float)_cpu / Hz / seconds );
+    // cpu_usage = 100 * ((total_time / Hertz) / seconds)
+    return 1*((float)_cpu / Hz / seconds );
 }
 
 // TODO: Return the command that generated this process
