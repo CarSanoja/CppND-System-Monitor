@@ -13,6 +13,6 @@ float Processor::Utilization()
         }
     }
     usage = (total_jiffies - ti_jiffies) / total_jiffies;
-    
+    //std::cout << "usage " << usage << std::endl;
     return usage; 
 }
