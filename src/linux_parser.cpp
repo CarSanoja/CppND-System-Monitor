@@ -67,10 +67,50 @@ vector<int> LinuxParser::Pids() {
 }
 
 // TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization()
+{
+  float total_memory;
+  float free_memory;
+  string key;
+  string value;
+  string line;
+  string extra;
+  std::ifstream stream(kProcDirectory + kMeminfoFilename);
+  if (stream.is_open()) {
+    while (std::getline(stream, line)){
+      std::replace(line.begin(), line.end(), ':', ' ');
+  		std::istringstream linestream(line);
+    	while ( linestream >> key >> value >> extra) {
+        	if (key == "MemTotal") 
+          { 
+            total_memory = std::stof(value);
+          }
+          if (key == "MemFree") 
+          { 
+            free_memory = std::stof(value);
+          }
+        	}
+    	}
+  }
+  return (total_memory - free_memory) / total_memory;
+}
 
 // TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime()
+{
+  long int _uptime;
+  string uptime; 
+  string i_time;
+  string line;
+  std::ifstream stream(kProcDirectory + kUptimeFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+  	std::istringstream linestream(line);
+    linestream >> uptime >> i_time;
+    _uptime = std::stol(uptime);
+    }
+  return _uptime;
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
@@ -86,7 +126,23 @@ long LinuxParser::ActiveJiffies() { return 0; }
 long LinuxParser::IdleJiffies() { return 0; }
 
 // TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization()
+{
+  string value;
+  string key;
+  string line;
+  vector<string> jiffies_list;
+  std::ifstream stream(kProcDirectory + kStatFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+  	std::istringstream linestream(line);
+   	while (linestream >> key){
+    	if (key != "cpu"){
+          jiffies_list.push_back(key);}
+    }
+    }
+  return jiffies_list;
+}
 
 // TODO: Read and return the total number of processes
 int LinuxParser::TotalProcesses() { return 0; }
@@ -112,4 +168,34 @@ string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid) 
+{
+  string value;
+  string line;
+  long int start; 
+  long int up_time;
+  vector<string> aux;
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + kStatFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+    while (linestream >> value) {
+			aux.push_back(value);
+        }
+    }
+  /*
+  Note that the "starttime" value in this file is measured in "clock ticks". In order to convert from "clock ticks" to seconds, you must:
+
+    #include <unistd.h>
+    divide the "clock ticks" value by sysconf(_SC_CLK_TCK)
+
+  Once you have converted the time value to seconds, you can use the Format::Time() function from the project starter code to display the seconds in a "HH:MM:SS" format.
+  */
+ /*
+ std::stol(): This function converts the string, provided as an argument in the function call, to long int. It parses str interpreting its content as an integral number 
+ of the specified base, which is returned as a value of type long int. 
+ */
+  start = std::stol(aux[21])/sysconf(_SC_CLK_TCK);
+  up_time =  LinuxParser::UpTime() - start;
+  return up_time;
+}

@@ -2,6 +2,8 @@
 #define PROCESS_H
 
 #include <string>
+#include "linux_parser.h"
+
 /*
 Basic class for Process representation
 It contains relevant attributes as shown below
@@ -18,6 +20,8 @@ class Process {
 
   // TODO: Declare any necessary private members
  private:
+    float _cpu = 0.0;
+
 };
 
 #endif
