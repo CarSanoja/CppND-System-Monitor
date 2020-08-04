@@ -24,12 +24,10 @@ vector<Process>& System::Processes()
 {
     processes_.clear();
     std::vector<int> pids = LinuxParser::Pids();
-    
     for (int pid : pids){
         Process process(pid);
         processes_.emplace_back(process);
     }
-
     std::sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a < b;});
     return processes_;
 }
@@ -44,10 +42,10 @@ float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
 // TODO: Return the number of processes actively running on the system
-int System::RunningProcesses() { return 0; }
+int System::RunningProcesses() { LinuxParser::RunningProcesses(); }
 
 // TODO: Return the total number of processes on the system
-int System::TotalProcesses() { return 0; }
+int System::TotalProcesses() { return LinuxParser::TotalProcesses(); }
 
 // TODO: Return the number of seconds since the system started running
 long int System::UpTime() { return LinuxParser::UpTime(); }
